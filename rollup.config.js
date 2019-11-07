@@ -20,12 +20,3 @@ export default {
         terser()
     ]
 }
-
-// Hieronder verplaats ik de gemaakte JS mee via rollup van src naar public
-// module.exports = {
-//   input: 'src/app.js',
-//   output: {
-//     file: 'scripts/bundle.js',
-//     format: 'cjs'
-//   }
-// };
