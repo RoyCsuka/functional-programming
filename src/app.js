@@ -1,54 +1,66 @@
 import config from './queryResults.json'
 
-let jsonResultsDate = config.results.bindings;
+let jsonResultsYear = config.results.bindings;
 
 
 // Hoofdfunctie
 function main() {
-    convertTimeToItem(jsonResultsDate);
+    cleanDataYear(jsonResultsYear);
 }
 
 // geneste functie van function main die data opruimd
-function convertTimeToItem(array) {
-    array.map(array => {
+function cleanDataYear(array) {
+    var newArray = array.map(item => {
 
-        // Haalt alle haakjes () eruit
-        array.date.value = array.date.value.replace(/[()]/g, '');
-        // Haalt alle vraagtekens weg ?
-        array.date.value = array.date.value.replace(/[-?]/g, '');
+
+        // Alles naar uppercase ivm "ca" en  "Ca"
+        item.date.value = item.date.value.toUpperCase();
+        // Haalt alle haakjes "()" eruit
+        item.date.value = item.date.value.replace(/[()]/g, '');
+        // Haalt het ene resultaat weg met de waarde "[*1]"
+        item.date.value = item.date.value.replace(/[*1]/g, '');
+        // Haalt alle vraagtekens weg "?"
+        item.date.value = item.date.value.replace(/[?]/g, '');
+        // Haalt alle punten eruit "."
+        item.date.value = item.date.value.replace(/\./g,'');
+
+        if (item.date.value.includes("VOOR ")) {
+            item.date.value = item.date.value.replace("VOOR ", "");
+        }
+
+        if (item.date.value.includes("VOOROFIN")) {
+            item.date.value = item.date.value.replace("VOOROFIN", "");
+        }
+
+        if (item.date.value.includes("INOF")) {
+            item.date.value = item.date.value.replace("INOF", "");
+        }
+
+        if (item.date.value.includes("INOFVOOR")) {
+            item.date.value = item.date.value.replace("INOFVOOR", "");
+        }
+
+        if (item.date.value.includes("OFEERDER")) {
+            item.date.value = item.date.value.replace("OFEERDER", "");
+        }
+
+        if (item.date.value.includes("VOOR")) {
+            item.date.value = item.date.value.replace("VOOR", "");
+        }
+
+        if (item.date.value.includes("CA")) {
+            item.date.value = item.date.value.replace("CA", "");
+        }
         // Haalt alle spaties eruit
-        // array.date.value = array.date.value.replace(/\s/g,'');
+        item.date.value = item.date.value.replace(/\s/g,'');
 
-        // Als de lengte van de string 19 karakters is en een backslash heeft
-        if (array.date.value.length === 19 && array.date.value.includes(" / ")) {
-            // Split alle items op een backslash
-            let splitTwoNumbers = array.date.value.split("/")
-
-            array.date.value = {
-				tussen: splitTwoNumbers[0].replace(/^.{4}/g, ''),
-				en: splitTwoNumbers[1].replace(/^.{4}/g, '')
-			}
-
-            // verangt de eerste vier karakters van de array met niks
-            // let removeFirstFourChracters = array.date.value.replace(/^.{4}/g, '')
-
-            console.log(array.date.value)
-
-        }
-
-        if (array.date.value.includes("ca")) {
-            array.date.value = array.date.value.replace(/ca/g, "");
-        } else if (array.date.value.includes("ca.")) {
-            array.date.value = array.date.value.replace(/ca./g, "");
-        } else if (array.date.value.includes("eeuw")) {
-            array.date.value = array.date.value.replace(/eeuw/g, "");
-        }
-
-        // console.log(array.date.value);
+        console.log(item.date.value);
     })
 
-    let newArray = array;
+    let oldArray = newArray;
     return newArray;
 }
 
 main();
+
+console.log(newArray)
