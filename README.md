@@ -17,14 +17,13 @@ Het concept laat het aantal items per land zien op basis van een tijdsperiode.
 # Gebruik van data uit de database
 Aantal objecten tellen per land op basis van een tijdsperiode. In mijn [SPARQL query](https://github.com/RoyCsuka/functional-programming/wiki/SPARQL) leg ik hier meer over uit.
 
-
-# Credits
-
+# Credits voor:
+- Kris heeft mij geholpen met het opzetten van mijn werkomgeving (rollup.js).
 
 ## Technische specificaties
-
+- Wiebe heeft mij geholpen met mijn opgeschoonde data om te zetten naar pure code.
+- Coen heeft mij geholpen met het opschonen van data.
 
 ## Concept brainstroming
-- Manouk
-- Kim Garrard
-- Coen
+- Manouk heeft mij geholpen met mijn concept verder uit te denken.
+- Kim Garrard heeft mij feedback gegeven op kleur gebruik.
