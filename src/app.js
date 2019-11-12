@@ -1,58 +1,112 @@
 import config from './queryResults.json'
 
-let jsonResults = config.results.bindings;
+const jsonResults = config.results.bindings
+
+function main() {
+    convertYear(jsonResults);
+}
+
+function splitStringCalcAverage(data) {
+    var splitString = data.split("-")
 
 
+    if (splitString.length === 2) {
+        averageTwoYearsValue(splitString[0], splitString[1])
+    } else {
+        return splitString[2]
+    }
+}
 
-const cleanDataYear = jsonResults.map(item => {
-    // Alles naar uppercase ivm "ca" en  "Ca"
-    item.date.value = item.date.value.toLowerCase();
+function averageTwoYearsValue(firstValue, secondValue) {
+    return Math.round((firstValue*1 + secondValue*1) / 2);
+}
 
-    // Haalt alle haakjes "()" eruit
-    item.date.value = item.date.value.replace(/[()]/g, '');
-     // Haalt het ene resultaat weg met de waarde "[*1]"
-    item.date.value = item.date.value.replace(/[*1]/g, '');
-     // Haalt alle vraagtekens weg "?"
-    item.date.value = item.date.value.replace(/[?]/g, '');
-     // Haalt alle punten eruit "."
-    item.date.value = item.date.value.replace(/\./g,'');
+function cleanYearString(theData) {
+    // Alles naar lowercase ivm verschillen in strings "ca" en  "Ca"
+    theData.value = theData.value.toLowerCase();
 
-    if (item.date.value.includes("voor ")) {
-        item.date.value = item.date.value.replace("voor ", "");
+
+    // voor de zekerheid checken of de waarde een string is (zekeren voor het onzekeren)
+    if(theData.value && typeof theData.value === "string") {
+        // array van de tekens die ik als eerst wil vervangen
+        var replaceSymbolsArr = [ /\(/, /\)/, , /\?/, /\./, /\,/, /\s/, /\'/, /\:/, /\;/]
+        // regix tekens vervangen met niks met for loop
+        replaceSymbolsArr.forEach(value =>
+            theData.value = theData.value
+            .replace(
+                new RegExp(value, "g"), ""
+            )
+        )
+
+        theData.value = theData.value.replace("eeeuw", "eeuw")
+
+
+        if(theData.value.includes("bc")) {
+            theData.bc = true
+            theData.value = theData.value.replace("bc", "");
+            if (theData.value.includes("ad")) {
+                theData.adValue = true
+                theData.value = theData.value.replace("ad", "");
+            } else {
+                theData.adValue = false
+            }
+        } else {
+            theData.bc = false
+        }
+
+        if(theData.value.includes("vchr")) {
+            theData.vchr = true
+            theData.vchr = theData.value.replace("vchr", "")
+        } else {
+            theData.vchr = false
+        }
+
+        if(theData.value.includes("eeuw")) {
+            theData.eeuw = true
+            theData.value = theData.value.replace("eeuw", "")
+        } else {
+            theData.eeuw = false
+        }
+
+        var replaceCharacterssArr = ["a","b","c","d","e","f","g","h","i","j","k","l","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+        replaceCharacterssArr.forEach(el =>
+            theData.value = theData.value
+            .replace(
+                new RegExp(el, "g"), ""
+            )
+        )
+
+        if (theData.value.includes("/")) {
+            theData.value = theData.value.replace('/', "-");
+        }
+
     }
 
-    if (item.date.value.includes("inof")) {
-        item.date.value = item.date.value.replace("inof", "");
-    }
+    return theData
+}
 
-    if (item.date.value.includes("inofvoor")) {
-        item.date.value = item.date.value.replace("inofvoor", "");
-    }
+function convertYear(item) {
+    item.map(el => {
+        var cleanDateValue = cleanYearString(el.date)
 
-    if (item.date.value.includes("voorofin")) {
-        item.date.value = item.date.value.replace("voorofin", "");
-    }
+        if(cleanDateValue.value.includes("-") && cleanDateValue.value.length === 9) {
+            cleanDateValue.value = splitStringCalcAverage(cleanDateValue.value)
+        }
 
-    if (item.date.value.includes("ofeerder")) {
-        item.date.value = item.date.value.replace("ofeerder", "");
-    }
+        if(cleanDateValue.eeuw === true && cleanDateValue.vchr === false) {
+            console.log(cleanDateValue)
+            console.log(cleanDateValue.value)
+            // cleanDateValue.value = splitStringEeuw(cleanDateValue.value)
+        }
 
-    if (item.date.value.includes("voor")) {
-        item.date.value = item.date.value.replace("voor", "");
-    }
 
-    if (item.date.value.includes("ca")) {
-        item.date.value = item.date.value.replace("ca", "");
-    }
+        // console.log(cleanDateValue.value)
+        // console.log(Number(cleanDateValue.value))
 
-    if (item.date.value.includes("eeuw")) {
-        item.date.value = item.date.value.replace("eeuw", "");
-    }
+    })
 
-    // Haalt alle spaties eruit
-    item.date.value = item.date.value.replace(/\s/g,'');
+    let newArr = item;
+    return newArr;
+}
 
-    console.log(item.date.value)
-
-    return item
-})
+main()
