@@ -1,15 +1,15 @@
 # ID Tech-track - Functional Programming
 ## De opdracht
-Voor de opdrachtgever van dit project wordt er een digitale visualisatie vanuit de exterene database van het museum. De opdracht gaat over een passende visaulisatie maken die past bij de geschiedenis van het tropenmuseum.
+Voor de opdrachtgever van dit project wordt er een digitale visualisatie vanuit de exterene database van het museum. De opdracht gaat over een passende visaulisatie maken die past bij de geschiedenis en de collectie van het tropenmuseum.
 
 ## Wat is functional programming? (samenvatting)
-Dit is simpel gezegd programmeren met een bepaald patroon. Dit patroon heeft flexibele / herbruikbare functies die naar elkaar luisteren en deze kun je in elke volgorde dan ook runnen zonder dat de code breekt. Zo schrijf je eerst code voor een specifiek stukje en daarna zet je dit om naar functies die herbruikbaar zijn en waar de waardes algemene variabele zijn. Voor volledige uitleg in onderbouwing zie [mijn wiki](https://github.com/RoyCsuka/functional-programming/wiki/).
+Dit is simpel gezegd programmeren met een bepaald patroon. Dit patroon heeft flexibele / herbruikbare functies die naar elkaar luisteren en deze kun je in elke volgorde dan ook runnen zonder dat de code breekt. Zo schrijf je eerst code voor een specifiek stukje (object oriented) en daarna zet je dit om naar functies die herbruikbaar zijn en waar de waardes algemene variabele zijn of paramaters. Voor volledige uitleg en onderbouwing zie [mijn wiki](https://github.com/RoyCsuka/functional-programming/wiki/).
 
 ## Leerdoelen
 Er wordt geleerd over algemene functies schrijven, het schoonmaken en het transformeren van data, SVG gebruik en we gaan werken in D3. Om het volledige proces van dit project te vinden bekijk mijn [wiki](https://github.com/RoyCsuka/functional-programming/wiki/logboek).
 
 # Concept
-Mijn concept focust zich op het aantal items laten zien op basis van herkomst in combinatie met tijd. Als visuele uitwerking heb ik gekozen voor een map (zie afbeelding hieronder).
+Mijn concept focust zich op het aantal items laten zien op basis van herkomst in combinatie met tijd. Als visuele uitwerking heb ik gekozen voor een map (zie afbeelding hieronder). [Het resultaat van mijn concept.](https://roycsuka.github.io/functional-programming/public/)
 
 ![Concept uitwerking](https://github.com/RoyCsuka/assets/blob/master/concept-maps.jpg)
 Het concept laat het aantal items per land zien op basis van een tijdsperiode.
