@@ -3,7 +3,7 @@ import config from './queryResults.json'
 const jsonResults = config.results.bindings
 
 function main() {
-    convertYear(jsonResults);
+    return convertYear(jsonResults);
 }
 
 // Props: Wiebe
@@ -31,6 +31,8 @@ function splitStringEeuw(data) {
     if(splitEeuw[0].length === 2) {
         return splitEeuw[0]
     } else if(splitEeuw[0].length === 3) {
+        // stackoverflow: https://stackoverflow.com/questions/35486533/how-can-i-replace-first-two-characters-of-a-string-in-javascript
+        // Hier heb ik alleen een geneste array omdat ik de lengte van het eerste object wil weten
         return splitEeuw[0][1] + splitEeuw[0][2] + "00"
     } else if(splitEeuw.length === 1) {
         return splitEeuw
@@ -63,7 +65,7 @@ function cleanYearString(theData) {
 
         theData.value = theData.value.replace("eeeuw", "eeuw")
 
-
+        // Props: Wiebe
         if(theData.value.includes("bc")) {
             theData.bc = true
             theData.value = theData.value.replace("bc", "");
@@ -91,6 +93,7 @@ function cleanYearString(theData) {
             theData.eeuw = false
         }
 
+        // Props: Wiebe
         var replaceCharacterssArr = ["a","b","c","d","e","f","g","h","i","j","k","l","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
         replaceCharacterssArr.forEach(el =>
             theData.value = theData.value
@@ -107,6 +110,7 @@ function cleanYearString(theData) {
     return theData
 }
 
+// functie die loopt over de items
 function convertYear(item) {
     item.map(el => {
         var cleanDate = cleanYearString(el.date)
@@ -132,33 +136,29 @@ function convertYear(item) {
 
     let newArr = item;
     let finalArray = deleteUnformattedData(newArr)
-    console.log(finalArray)
+    // console.log(finalArray)
     return newArr;
 }
 
 // Props: Coen
-function deleteUnformattedData (array) {
+function deleteUnformattedData(array) {
     const finalArray = array.filter(item => {
         if (item.date.value.toString().length === 4) {
+            console.log(item.date.value.toString())
+            console.log(item.date.value.toString().slice((0, -2))) // > dit is het antwoord string[1] + string[0] + string.slice(2)
             return item
         }
     })
  return finalArray
 }
 
-let cleanedDataset = main()
-
-console.log(cleanedDataset)
+// einde opschonen van data
 
 
 
 
+// begin D3 data transfomeren
 
-
-// D3 code
-// Algemene variabele
-
-const queryLimit = 10000
 const query = `PREFIX wgs84: <http://www.w3.org/2003/01/geo/wgs84_pos#>
 PREFIX geo: <http://www.opengis.net/ont/geosparql#>
 PREFIX gn: <http://www.geonames.org/ontology#>
@@ -177,45 +177,68 @@ SELECT ?landLabel ?lat ?long ?date (COUNT(?cho) AS ?choCount) WHERE {
         dct:spatial ?plaats .
  # We willen geen datums die de string [NI] bevatten
    FILTER (!REGEX(?date, "[NI]")) . #zorgt ervoor dat de string "NI" niet wordt meegenomen
- # geef het label van het land waar de plaats ligt
+ # geef het label van het land waar de plaats ligt en de lat/long van het land
    ?plaats skos:exactMatch/gn:parentCountry ?land .
-   ?land skos:exactMatch/wgs84:lat ?lat .
-   ?land skos:exactMatch/wgs84:long ?long .
+   ?land wgs84:lat ?lat .
+   ?land wgs84:long ?long .
    ?land gn:name ?landLabel .
 } GROUP BY ?date ?landLabel ?lat ?long
-ORDER BY DESC(?choCount) LIMIT ${queryLimit}`
+ORDER BY DESC(?choCount)`
+
 //Please use your own endpoint when using this
 const endpoint = "https://api.data.netwerkdigitaalerfgoed.nl/datasets/ivo/NMVW/services/NMVW-14/sparql"
-const  dataSource = cleanedDataset
 
 makeVisualization()
 
 // Our main function which runs other function to make a visualization
 async function makeVisualization(){
-  //Wait for the promise to resolve with the data
-  let data = await loadData(endpoint, query)
-  console.log("rawData: ", data)
-	data = data.map(cleanData)
-  console.log("cleanedData: ", data)
+    //Wait for the promise to resolve with the data
+    let data = await loadData(endpoint, query)
+    console.log("rawData: ", data)
+
+    // deze roept de main functie die de jaartallen schoon maakt
+    data = main(data)
+    console.log("cleanedData of dataset: ", data)
+
+    data = data.map(cleanData)
+    console.log("cleanedData: ", data)
+
 	data = transformData(data)
-  console.log("transformedData: ", data)
-  console.log(data)
+    console.log("transformedData: ", data)
+
+    console.log(data)
 }
 
 //Load the data and return a promise which resolves with said data
 function loadData(url, query){
-  return cleanedDataset
-    .then(data => config.results.bindings)
+  return d3.json(endpoint +"?query="+ encodeURIComponent(query) + "&format=json")
+    .then(data => data.results.bindings)
 }
+
+//Nest the data per eeuw HIER WAS IK GEBLEVEN. LAASTSTE EDIT TRANSFORM DATA
+// function transformData(source){
+//   let transformed =  d3.nest()
+// 		.key(function(d) { return d.landLabel; })
+//         .rollup(function(v) { return {
+//           count: v.length,
+//           total: d3.sum(v, function(d) { return d.amount; }),
+//           avg: d3.mean(v, function(d) { return d.amount; })
+//         }; })
+// 		.entries(source);
+//     transformed.forEach(country => {
+//       country.amount = country.values.length
+//     })
+//   return transformed
+// }
 
 //Nest the data per country
 function transformData(source){
   let transformed =  d3.nest()
 		.key(function(d) { return d.landLabel; })
 		.entries(source);
-  transformed.forEach(country => {
-    country.amount = country.values.length
-  })
+    transformed.forEach(country => {
+      country.amount = country.values.length
+    })
   return transformed
 }
 
@@ -233,16 +256,7 @@ function cleanData(row){
 
 
 
-
-
-
-
-
-
-
-
-// CODE VOOR DE KAART STAAT HIERONDER
-
+// D3 code
 // import { select, json, geoPath, geoNaturalEarth1 } from 'd3';
 // import { feature } from 'topojson';
 //
@@ -271,6 +285,7 @@ function cleanData(row){
 //    ?land gn:name ?landLabel .
 // } GROUP BY ?date ?landLabel ?lat ?long
 // ORDER BY DESC(?choCount)`
+//
 // //Please use your own endpoint when using this
 // const endpoint = "https://api.data.netwerkdigitaalerfgoed.nl/datasets/ivo/NMVW/services/NMVW-14/sparql"
 //
@@ -279,6 +294,7 @@ function cleanData(row){
 // const circleSize = 8
 // const projection = geoNaturalEarth1()
 // const pathGenerator = geoPath().projection(projection)
+// // const cleanedDataset = main()
 //
 // setupMap()
 // drawMap()
@@ -304,17 +320,27 @@ function cleanData(row){
 //   })
 // }
 //
+//
 // function plotLocations() {
 //   fetch(endpoint +"?query="+ encodeURIComponent(query) + "&format=json")
 //     .then(data => data.json())
-//   	.then(json => json.results.bindings)
+//     // Got this fetch code from Coen
+//     .then(json => {
+//       let fetchedData = json.results.bindings
+//       return fetchedData
+//     })
+//     .then(fetchedData => {
+//         let newData = cleanYearString(fetchedData)
+//         console.log('data: ', newData)
+//     })
 //     .then(results => {
 //     //TODO: clean up results in separate function
 //     	results.forEach(result => {
 //         result.lat = Number(result.lat.value)
 //         result.long = Number(result.long.value)
+//         result.date = Number(result.date.value)
 //       })
-//     	console.log(results)
+//     console.log(results)
 //
 //     svg
 //         .selectAll('circle')
