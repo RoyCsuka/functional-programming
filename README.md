@@ -14,7 +14,18 @@ Mijn concept focust zich op het aantal items laten zien op basis van herkomst in
 ![Concept uitwerking](https://github.com/RoyCsuka/assets/blob/master/concept-maps.jpg)
 Het concept laat het aantal items per land zien op basis van een tijdsperiode.
 
-# Gebruik van data uit de database
+# Data
+## Opschonen met JavaScript
+In mijn [Wiki leg ik stap voor stap uit](https://github.com/RoyCsuka/functional-programming/wiki/logboek) hoe ik mijn data heb schoongemaakt. I.v.m. tijdsnood heb ik de "v.chr", "n.chr", "bc" en "ad" data waardes en niet schoon kunnen maken. Daarom heb ik ervoor gekozen om deze if statement nog te defineren voordat ik de data terug geef aan mijn main functie.
+```
+if (item.date.value.toString().length === 4 && item.date.value <= 2019 && item.date.value >= 0) {
+    // console.log(item.date.value)
+    return item
+}
+```
+Hierdoor is de data niet 100% compleet maar heb ik wel het functionele gedeelte gedaan.
+
+## SPARQL database
 Aantal objecten tellen per land op basis van een tijdsperiode. In mijn [SPARQL query](https://github.com/RoyCsuka/functional-programming/wiki/SPARQL) leg ik hier meer over uit.
 
 # Credits voor:
