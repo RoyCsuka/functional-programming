@@ -28,6 +28,22 @@ Hierdoor is de data niet 100% compleet maar heb ik wel het functionele gedeelte 
 ## SPARQL database
 Aantal objecten tellen per land op basis van een tijdsperiode. In mijn [SPARQL query](https://github.com/RoyCsuka/functional-programming/wiki/SPARQL) leg ik hier meer over uit.
 
+## Data transformeren met D3
+Met D3 heb ik de [code van Laurens](https://beta.vizhub.com/Razpudding/2e039bf6e39a421180741285a8f735a3) gepakt en maar twee zinnen van veranderd waardoor de groepering en counting van de arrays anders is gegaan. Met als eindresultaat:
+```
+0: {key: "1900", values: Array(4907), amount: 4907}
+1: {key: "1100", values: Array(80), amount: 80}
+2: {key: "1800", values: Array(929), amount: 929}
+3: {key: "1200", values: Array(64), amount: 64}
+4: {key: "2000", values: Array(252), amount: 252}
+5: {key: "1300", values: Array(36), amount: 36}
+6: {key: "1000", values: Array(79), amount: 79}
+7: {key: "1400", values: Array(31), amount: 31}
+8: {key: "1600", values: Array(46), amount: 46}
+9: {key: "1500", values: Array(40), amount: 40}
+10: {key: "1700", values: Array(102), amount: 102}
+```
+
 # Credits voor:
 - Kris heeft mij geholpen met het opzetten van mijn werkomgeving (rollup.js).
 
