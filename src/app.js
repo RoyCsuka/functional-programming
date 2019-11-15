@@ -35,7 +35,7 @@ function splitStringEeuw(data) {
         // Hier heb ik alleen een geneste array omdat ik de lengte van het eerste object wil weten
         return splitEeuw[0][1] + splitEeuw[0][2] + "00"
     } else if(splitEeuw.length === 1) {
-        return splitEeuw
+        return data
     } else {
         if(splitEeuw[1].length <= 2) {
             return splitEeuw[1] + "00"
@@ -65,7 +65,9 @@ function cleanYearString(theData) {
 
         theData.value = theData.value.replace("eeeuw", "eeuw")
 
-        // Props: Wiebe
+        // Props: Wiebe en Stackoverflow (zie hieronder)
+        // https://stackoverflow.com/questions/25095789/return-an-object-key-only-if-value-is-true
+        // Stackoverflow heeft mij duidelijk gemaakt dat je een nieuwe key aan je object kan meegeven die de waarde true kan hebben.
         if(theData.value.includes("bc")) {
             theData.bc = true
             theData.value = theData.value.replace("bc", "");
@@ -130,22 +132,23 @@ function convertYear(item) {
             }
         }
 
-        cleanDate.value = parseInt(cleanDate.value)
+        // console.log(cleanDate.value[0] + cleanDate.value[1])
 
+        cleanDate.value = cleanDate.value[0] + cleanDate.value[1] + "00"
+        // Maak alles cijfers
+        cleanDate.value = parseInt(cleanDate.value)
     })
 
     let newArr = item;
     let finalArray = deleteUnformattedData(newArr)
-    // console.log(finalArray)
-    return newArr;
+    return finalArray;
 }
 
 // Props: Coen
 function deleteUnformattedData(array) {
     const finalArray = array.filter(item => {
-        if (item.date.value.toString().length === 4) {
-            console.log(item.date.value.toString())
-            console.log(item.date.value.toString().slice((0, -2))) // > dit is het antwoord string[1] + string[0] + string.slice(2)
+        if (item.date.value.toString().length === 4 && item.date.value <= 2019 && item.date.value >= 0) {
+            // console.log(item.date.value)
             return item
         }
     })
@@ -156,9 +159,9 @@ function deleteUnformattedData(array) {
 
 
 
-
-// begin D3 data transfomeren
-
+// Laurens zijn code!
+// D3 data transfomeren
+// Eigen query aangepast
 const query = `PREFIX wgs84: <http://www.w3.org/2003/01/geo/wgs84_pos#>
 PREFIX geo: <http://www.opengis.net/ont/geosparql#>
 PREFIX gn: <http://www.geonames.org/ontology#>
@@ -196,6 +199,7 @@ async function makeVisualization(){
     let data = await loadData(endpoint, query)
     console.log("rawData: ", data)
 
+    // Hieronder heb ik toegevoegd
     // deze roept de main functie die de jaartallen schoon maakt
     data = main(data)
     console.log("cleanedData of dataset: ", data)
@@ -215,26 +219,12 @@ function loadData(url, query){
     .then(data => data.results.bindings)
 }
 
-//Nest the data per eeuw HIER WAS IK GEBLEVEN. LAASTSTE EDIT TRANSFORM DATA
-// function transformData(source){
-//   let transformed =  d3.nest()
-// 		.key(function(d) { return d.landLabel; })
-//         .rollup(function(v) { return {
-//           count: v.length,
-//           total: d3.sum(v, function(d) { return d.amount; }),
-//           avg: d3.mean(v, function(d) { return d.amount; })
-//         }; })
-// 		.entries(source);
-//     transformed.forEach(country => {
-//       country.amount = country.values.length
-//     })
-//   return transformed
-// }
-
 //Nest the data per country
 function transformData(source){
   let transformed =  d3.nest()
-		.key(function(d) { return d.landLabel; })
+
+        // LandLabel heb ik veranderd
+		.key(function(d) { return d.date; })
 		.entries(source);
     transformed.forEach(country => {
       country.amount = country.values.length
@@ -256,40 +246,8 @@ function cleanData(row){
 
 
 
-// D3 code
-// import { select, json, geoPath, geoNaturalEarth1 } from 'd3';
-// import { feature } from 'topojson';
-//
-// const query = `PREFIX wgs84: <http://www.w3.org/2003/01/geo/wgs84_pos#>
-// PREFIX geo: <http://www.opengis.net/ont/geosparql#>
-// PREFIX gn: <http://www.geonames.org/ontology#>
-// PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-// PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-// PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-// PREFIX dc: <http://purl.org/dc/elements/1.1/>
-// PREFIX dct: <http://purl.org/dc/terms/>
-// PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-// PREFIX edm: <http://www.europeana.eu/schemas/edm/>
-// PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-//
-// # let op: geeft aantal van unieke combinaties van ?date en ?landLabel
-// SELECT ?landLabel ?lat ?long ?date (COUNT(?cho) AS ?choCount) WHERE {
-//    ?cho dct:created ?date;
-//         dct:spatial ?plaats .
-//  # We willen geen datums die de string [NI] bevatten
-//    FILTER (!REGEX(?date, "[NI]")) . #zorgt ervoor dat de string "NI" niet wordt meegenomen
-//  # geef het label van het land waar de plaats ligt en de lat/long van het land
-//    ?plaats skos:exactMatch/gn:parentCountry ?land .
-//    ?land wgs84:lat ?lat .
-//    ?land wgs84:long ?long .
-//    ?land gn:name ?landLabel .
-// } GROUP BY ?date ?landLabel ?lat ?long
-// ORDER BY DESC(?choCount)`
-//
-// //Please use your own endpoint when using this
-// const endpoint = "https://api.data.netwerkdigitaalerfgoed.nl/datasets/ivo/NMVW/services/NMVW-14/sparql"
-//
-// const svg = select('svg')
+// D3 map!
+// const svg = select('body svg')
 // const circleDelay = 10
 // const circleSize = 8
 // const projection = geoNaturalEarth1()
