@@ -2,54 +2,49 @@ import config from './queryResults.json'
 
 const jsonResults = config.results.bindings
 
-function main() {
-    return convertYear(jsonResults);
+// Dezen functie cleaned alle data
+function cleanAllData() {
+    // https://stackoverflow.com/questions/11385438/return-multiple-functions
+    let cleanYear = convertToYear(jsonResults);
+    let makeCountNumber = aantalItemsPerLandPerJaar(jsonResults);
+    return cleanYear && makeCountNumber
 }
 
-// Props: Wiebe
-function splitStringCalcAverage(data) {
-    var splitString = data.split("-")
+// functie die loopt over de items
+function convertToYear(item) {
+    item.forEach(el => {
+        // Roept functie aan om alle gekke karakters schoon te maken
+        var callCleanAll = cleanAllCharactersOfYear(el.date)
 
-    if (splitString.length === 2) {
-        // bereken het gemiddelde met een andere functie van de waarde 1997-1998
-        return averageTwoYearsValue(splitString[0], splitString[1])
-    } else {
-        // return van 01-01-1998 alleen de waarde 1998
-        return splitString[2]
-    }
-}
-
-// Props: Wiebe
-function averageTwoYearsValue(firstValue, secondValue) {
-    return Math.round((firstValue*1 + secondValue*1) / 2);
-}
-
-// Functie die de eeuwen split
-function splitStringEeuw(data) {
-    var splitEeuw = data.toString().split("-")
-
-    if(splitEeuw[0].length === 2) {
-        return splitEeuw[0]
-    } else if(splitEeuw[0].length === 3) {
-        // stackoverflow: https://stackoverflow.com/questions/35486533/how-can-i-replace-first-two-characters-of-a-string-in-javascript
-        // Hier heb ik alleen een geneste array omdat ik de lengte van het eerste object wil weten
-        return splitEeuw[0][1] + splitEeuw[0][2] + "00"
-    } else if(splitEeuw.length === 1) {
-        return data
-    } else {
-        if(splitEeuw[1].length <= 2) {
-            return splitEeuw[1] + "00"
-        } else {
-            return splitEeuw[1]
+        if(callCleanAll.value.includes("-") && callCleanAll.value.length >= 9) {
+            callCleanAll.value = splitStringCalcAverage(callCleanAll.value)
         }
-    }
+
+        if(callCleanAll.eeuw === true && callCleanAll.vchr === false) {
+            if(callCleanAll.value.length === 1) {
+                callCleanAll.value.replace("-", "")
+                callCleanAll.value + "00";
+            } else if(callCleanAll.value.length >= 5 && !callCleanAll.value.includes("-")) {
+                callCleanAll.value.slice(-4)
+            } else {
+                callCleanAll.value = splitStringEeuw(callCleanAll.value)
+            }
+        }
+
+        callCleanAll.value = callCleanAll.value[0] + callCleanAll.value[1] + "00"
+        // Maak alles cijfers
+        callCleanAll.value = parseInt(callCleanAll.value)
+    })
+
+    let newArr = item;
+    let finalArray = deleteUnformattedData(newArr)
+    return finalArray;
 }
 
 // functie die alle tekens enzovoort schoonmaakt
-function cleanYearString(theData) {
+function cleanAllCharactersOfYear(theData) {
     // Alles naar lowercase ivm verschillen in strings "ca" en  "Ca"
     theData.value = theData.value.toLowerCase();
-
 
     // voor de zekerheid checken of de waarde een string is (zekeren voor het onzekeren)
     if(theData.value && typeof theData.value === "string") {
@@ -112,43 +107,56 @@ function cleanYearString(theData) {
     return theData
 }
 
-// functie die loopt over de items
-function convertYear(item) {
+function aantalItemsPerLandPerJaar(item) {
     item.map(el => {
-        var cleanDate = cleanYearString(el.date)
-
-        if(cleanDate.value.includes("-") && cleanDate.value.length >= 9) {
-            cleanDate.value = splitStringCalcAverage(cleanDate.value)
-        }
-
-        if(cleanDate.eeuw === true && cleanDate.vchr === false) {
-            if(cleanDate.value.length === 1) {
-                cleanDate.value.replace("-", "")
-                cleanDate.value + "00";
-            } else if(cleanDate.value.length >= 5 && !cleanDate.value.includes("-")) {
-                cleanDate.value.slice(-4)
-            } else {
-                cleanDate.value = splitStringEeuw(cleanDate.value)
-            }
-        }
-
-        // console.log(cleanDate.value[0] + cleanDate.value[1])
-
-        cleanDate.value = cleanDate.value[0] + cleanDate.value[1] + "00"
-        // Maak alles cijfers
-        cleanDate.value = parseInt(cleanDate.value)
+        el.choCount.value = parseInt(el.choCount.value)
     })
+    return item
+}
 
-    let newArr = item;
-    let finalArray = deleteUnformattedData(newArr)
-    return finalArray;
+// Props: Wiebe
+function splitStringCalcAverage(data) {
+    var splitString = data.split("-")
+
+    if (splitString.length === 2) {
+        // bereken het gemiddelde met een andere functie van de waarde 1997-1998
+        return averageTwoYearsValue(splitString[0], splitString[1])
+    } else {
+        // return van 01-01-1998 alleen de waarde 1998
+        return splitString[2]
+    }
+}
+
+// Props: Wiebe
+function averageTwoYearsValue(firstValue, secondValue) {
+    return Math.round((firstValue*1 + secondValue*1) / 2);
+}
+
+// Functie die de eeuwen split
+function splitStringEeuw(data) {
+    var splitEeuw = data.toString().split("-")
+
+    if(splitEeuw[0].length === 2) {
+        return splitEeuw[0]
+    } else if(splitEeuw[0].length === 3) {
+        // stackoverflow: https://stackoverflow.com/questions/35486533/how-can-i-replace-first-two-characters-of-a-string-in-javascript
+        // Hier heb ik alleen een geneste array omdat ik de lengte van het eerste object wil weten
+        return splitEeuw[0][1] + splitEeuw[0][2] + "00"
+    } else if(splitEeuw.length === 1) {
+        return data
+    } else {
+        if(splitEeuw[1].length <= 2) {
+            return splitEeuw[1] + "00"
+        } else {
+            return splitEeuw[1]
+        }
+    }
 }
 
 // Props: Coen
 function deleteUnformattedData(array) {
     const finalArray = array.filter(item => {
         if (item.date.value.toString().length === 4 && item.date.value <= 2019 && item.date.value >= 0) {
-            // console.log(item.date.value)
             return item
         }
     })
@@ -188,20 +196,19 @@ SELECT ?landLabel ?lat ?long ?date (COUNT(?cho) AS ?choCount) WHERE {
 } GROUP BY ?date ?landLabel ?lat ?long
 ORDER BY DESC(?choCount)`
 
-//Please use your own endpoint when using this
+// Eigen endpoint
 const endpoint = "https://api.data.netwerkdigitaalerfgoed.nl/datasets/ivo/NMVW/services/NMVW-14/sparql"
 
 makeVisualization()
 
-// Our main function which runs other function to make a visualization
+// Our cleanAllData function which runs other function to make a visualization
 async function makeVisualization(){
     //Wait for the promise to resolve with the data
     let data = await loadData(endpoint, query)
     console.log("rawData: ", data)
 
-    // Hieronder heb ik toegevoegd
-    // deze roept de main functie die de jaartallen schoon maakt
-    data = main(data)
+    // deze roept de cleanAllData functie aan die de jaartallen schoon maakt
+    data = cleanAllData(data)
     console.log("cleanedData of dataset: ", data)
 
     data = data.map(cleanData)
@@ -209,8 +216,6 @@ async function makeVisualization(){
 
 	data = transformData(data)
     console.log("transformedData: ", data)
-
-    console.log(data)
 }
 
 //Load the data and return a promise which resolves with said data
@@ -222,13 +227,22 @@ function loadData(url, query){
 //Nest the data per country
 function transformData(source){
   let transformed =  d3.nest()
-
-        // LandLabel heb ik veranderd
-		.key(function(d) { return d.date; })
-		.entries(source);
-    transformed.forEach(country => {
-      country.amount = country.values.length
-    })
+        // Op landLabel heb ik gegroepeerd in de transformed.forEach method. Dit is allemaal geschreven door Laurens
+		.key(function(d) {
+            return d.date;
+        })
+        .key(function(d) {
+            return d.landLabel;
+        })
+        // Dit is een rollup functie die door de array waardes van elke groep heen loopt. De waarde is weer gebaseerd op die array.
+        // Geeft de lengte terug van de date
+        .rollup(function(v) {
+            return d3.sum(v, function(d) {
+                return d.amount;
+            });
+         })
+        // Dit is de array van de data
+		.object(source);
   return transformed
 }
 
@@ -237,88 +251,8 @@ function transformData(source){
 function cleanData(row){
    let result = {}
     Object.entries(row)
-    	.forEach(([key, propValue]) => {
-				result[key] = propValue.value
+        .forEach(([key, propValue]) => {
+            result[key] = propValue.value
   	})
    return result
 }
-
-
-
-
-// D3 map!
-// const svg = select('body svg')
-// const circleDelay = 10
-// const circleSize = 8
-// const projection = geoNaturalEarth1()
-// const pathGenerator = geoPath().projection(projection)
-// // const cleanedDataset = main()
-//
-// setupMap()
-// drawMap()
-// plotLocations()
-//
-// function setupMap(){
-//   svg
-//     .append('path')
-//     .attr('class', 'sphere')
-//     .attr('d', pathGenerator({ type: 'Sphere' }))
-// }
-//
-// function drawMap() {
-//   d3.json('https://unpkg.com/world-atlas@1.1.4/world/110m.json').then(data => {
-//     const countries = feature(data, data.objects.countries);
-//     svg
-//       .selectAll('path')
-//       .data(countries.features)
-//       .enter()
-//       .append('path')
-//       .attr('class', 'country')
-//       .attr('d', pathGenerator)
-//   })
-// }
-//
-//
-// function plotLocations() {
-//   fetch(endpoint +"?query="+ encodeURIComponent(query) + "&format=json")
-//     .then(data => data.json())
-//     // Got this fetch code from Coen
-//     .then(json => {
-//       let fetchedData = json.results.bindings
-//       return fetchedData
-//     })
-//     .then(fetchedData => {
-//         let newData = cleanYearString(fetchedData)
-//         console.log('data: ', newData)
-//     })
-//     .then(results => {
-//     //TODO: clean up results in separate function
-//     	results.forEach(result => {
-//         result.lat = Number(result.lat.value)
-//         result.long = Number(result.long.value)
-//         result.date = Number(result.date.value)
-//       })
-//     console.log(results)
-//
-//     svg
-//         .selectAll('circle')
-//         .data(results)
-//         .enter()
-//         .append('circle')
-//         .attr('class', 'circles')
-//         .attr('cx', function(d) {
-//           return projection([d.long, d.lat])[0]
-//         })
-//         .attr('cy', function(d) {
-//           return projection([d.long, d.lat])[1]
-//         })
-//         .attr('r', '0px')
-//     		//Opacity is quite heavy on the rendering process so I've turned it off
-//     		//.attr('opacity', .5)
-//         .transition()
-//     				.delay(function(d, i) { return i * circleDelay; })
-//             .duration(1500)
-//             .ease(d3.easeBounce)
-//             .attr('r', circleSize+'px')
-//   })
-// }
