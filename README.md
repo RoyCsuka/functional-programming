@@ -15,6 +15,8 @@ Mijn concept focust zich op het aantal items laten zien op basis van herkomst in
 Het concept laat het aantal items per land zien op basis van een tijdsperiode.
 
 ## Resultaat
+Het resultaat voor de herkansing is hieronder te zien. Wat ik nu meer heb gedaan is het de kaart tonen (eerst was er nog niks in D3 gedaan) en mijn code leesbaarder gemaakt. [Lees meer over mijn herkansing hier](https://github.com/RoyCsuka/functional-programming/wiki/herkansing)
+
 ![Resultaat](https://i.gyazo.com/152efbedcad38b4093f4a2097cfc0821.png)
 
 # Data
