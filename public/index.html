@@ -4,9 +4,27 @@
     <script src="https://unpkg.com/topojson@3.0.2/dist/topojson.min.js"></script>
 </head>
 <body>
-    <h1>Console log die handel!</h1>
-    <p>Helaas nog niet mijn concept verwerkt in D3</p>
-    <svg></svg>
+    <header>
+        <h1>Alle objecten uit het museum per honderd jaar</h1>
+        <p>Totaal <b></b> objecten tussen het jaar <b></b></p>
+    </header>
+
+    <form id="form">
+        <div class="active-bk"></div>
+        <label class="active"><span>20e euuw<input type="radio" name="century" value="2000"></span></label>
+        <label><span>19e euuw<input type="radio" name="century" value="2000"></span></label>
+        <label><span>18e euuw<input type="radio" name="century" value="1800"></span></label>
+        <label><span>17e euuw<input type="radio" name="century" value="1700"></span></label>
+        <label><span>16e euuw<input type="radio" name="century" value="1600"></span></label>
+        <label><span>15e euuw<input type="radio" name="century" value="1500"></span></label>
+        <label><span>14e euuw<input type="radio" name="century" value="1400"></span></label>
+        <label><span>13e euuw<input type="radio" name="century" value="1300"></span></label>
+        <label><span>12e euuw<input type="radio" name="century" value="1200"></span></label>
+        <label><span>11e euuw<input type="radio" name="century" value="1100"></span></label>
+    </form>
+    <section>
+        <svg></svg>
+    </section>
     <script src="scripts/bundle.js"></script>
 </body>
 <footer></footer>

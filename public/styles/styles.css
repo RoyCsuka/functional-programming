@@ -1,16 +1,123 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,700,700i&display=swap');
+
 body {
   margin: 0px;
   overflow: hidden;
 }
 
-.sphere {
-  fill: black;
+header {
+    margin-left: 15%;
+    padding-top: 20px;
+    text-align: center;
 }
 
-.country {
-  fill: goldenrod;
-  stroke: black;
+h1 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: normal;
+}
+
+p {
+    font-family: 'Roboto', sans-serif;
+    font-weight: normal;
+    font-size: 20px;
+}
+
+p b {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    font-style: italic;
+}
+
+form {
+    width: 15%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background-color: #dbdbdb;
+    height: calc(100vh - 100px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 50px 0px;
+}
+
+form label {
+    text-align: center;
+    cursor: hand;
+}
+
+form label span {
+    font-size: 25px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.active-bk {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100px;
+    top: 0;
+    background-color: white;
+    z-index: -1;
+    transition: 0.5s;
+}
+
+label,
+label span input {
+    display: block;
+}
+
+label span input {
+    opacity: 0;
+    margin-bottom: -15px;
+}
+
+label.active span {
+    font-weight: bolder;
+}
+
+section {
+    width: 90%;
+    margin-left: 10%;
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+}
+
+.sphere {
+  opacity: 0;
+}
+
+.asia,
+.north-america,
+.south-america,
+.europe,
+.africa,
+.oceania {
+  /* fill: brown; */
+  stroke: white;
   stroke-opacity: 0.1;
+}
+
+.north-america,
+.south-america {
+    fill: #3c6046;
+}
+
+.asia {
+    fill: #b4464a;
+}
+
+.africa {
+    fill: #cf9b35;
+}
+
+.europe {
+    fill: #4b20e2;
+}
+
+.oceania {
+    fill: #4f829b;
 }
 
 svg {
@@ -19,7 +126,14 @@ svg {
 }
 
 circle {
-  fill: white;
-	stroke: black;
-  stroke-width: .5;
+    fill: black;
+}
+
+/* http://bl.ocks.org/emmasaunders/d682fd84b67b304219e49b1e8385b1f8  */
+text {
+    fill: white;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    text-anchor: middle;
+    dominant-baseline: central;
 }

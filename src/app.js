@@ -1,173 +1,8 @@
-import config from './queryResults.json'
+import { select , geoNaturalEarth1} from 'd3'
+import { feature } from 'topojson'
+import { cleanedArr } from './cleanData.js';
+import { drawMap } from './drawMap.js';
 
-const jsonResults = config.results.bindings
-
-// Dezen functie cleaned alle data
-function cleanAllData() {
-    // https://stackoverflow.com/questions/11385438/return-multiple-functions
-    let cleanYear = convertToYear(jsonResults);
-    let makeCountNumber = aantalItemsPerLandPerJaar(jsonResults);
-    return cleanYear && makeCountNumber
-}
-
-// functie die loopt over de items
-function convertToYear(item) {
-    item.forEach(el => {
-        // Roept functie aan om alle gekke karakters schoon te maken
-        var callCleanAll = cleanAllCharactersOfYear(el.date)
-
-        if(callCleanAll.value.includes("-") && callCleanAll.value.length >= 9) {
-            callCleanAll.value = splitStringCalcAverage(callCleanAll.value)
-        }
-
-        if(callCleanAll.eeuw === true && callCleanAll.vchr === false) {
-            if(callCleanAll.value.length === 1) {
-                callCleanAll.value.replace("-", "")
-                callCleanAll.value + "00";
-            } else if(callCleanAll.value.length >= 5 && !callCleanAll.value.includes("-")) {
-                callCleanAll.value.slice(-4)
-            } else {
-                callCleanAll.value = splitStringEeuw(callCleanAll.value)
-            }
-        }
-
-        callCleanAll.value = callCleanAll.value[0] + callCleanAll.value[1] + "00"
-        // Maak alles cijfers
-        callCleanAll.value = parseInt(callCleanAll.value)
-    })
-
-    let newArr = item;
-    let finalArray = deleteUnformattedData(newArr)
-    return finalArray;
-}
-
-// functie die alle tekens enzovoort schoonmaakt
-function cleanAllCharactersOfYear(theData) {
-    // Alles naar lowercase ivm verschillen in strings "ca" en  "Ca"
-    theData.value = theData.value.toLowerCase();
-
-    // voor de zekerheid checken of de waarde een string is (zekeren voor het onzekeren)
-    if(theData.value && typeof theData.value === "string") {
-        // array van de tekens die ik als eerst wil vervangen
-        var replaceSymbolsArr = [/\(/, /\)/, , /\?/, /\./, /\,/, /\s/, /\'/, /\:/, /\;/]
-        // regix tekens vervangen met niks met for loop
-        replaceSymbolsArr.forEach(value =>
-            theData.value = theData.value
-            .replace(
-                new RegExp(value, "g"), ""
-            )
-        )
-
-        theData.value = theData.value.replace("eeeuw", "eeuw")
-
-        // Props: Wiebe en Stackoverflow (zie hieronder)
-        // https://stackoverflow.com/questions/25095789/return-an-object-key-only-if-value-is-true
-        // Stackoverflow heeft mij duidelijk gemaakt dat je een nieuwe key aan je object kan meegeven die de waarde true kan hebben.
-        if(theData.value.includes("bc")) {
-            theData.bc = true
-            theData.value = theData.value.replace("bc", "");
-            if (theData.value.includes("ad")) {
-                theData.adValue = true
-                theData.value = theData.value.replace("ad", "");
-            } else {
-                theData.adValue = false
-            }
-        } else {
-            theData.bc = false
-        }
-
-        if(theData.value.includes("vchr")) {
-            theData.vchr = true
-            theData.vchr = theData.value.replace("vchr", "")
-        } else {
-            theData.vchr = false
-        }
-
-        if(theData.value.includes("eeuw")) {
-            theData.eeuw = true
-            theData.value = theData.value.replace("eeuw", "")
-        } else {
-            theData.eeuw = false
-        }
-
-        // Props: Wiebe
-        var replaceCharacterssArr = ["a","b","c","d","e","f","g","h","i","j","k","l","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
-        replaceCharacterssArr.forEach(el =>
-            theData.value = theData.value
-            .replace(
-                new RegExp(el, "g"), ""
-            )
-        )
-
-        if (theData.value.includes("/")) {
-            theData.value = theData.value.replace('/', "-");
-        }
-    }
-
-    return theData
-}
-
-function aantalItemsPerLandPerJaar(item) {
-    item.map(el => {
-        el.choCount.value = parseInt(el.choCount.value)
-    })
-    return item
-}
-
-// Props: Wiebe
-function splitStringCalcAverage(data) {
-    var splitString = data.split("-")
-
-    if (splitString.length === 2) {
-        // bereken het gemiddelde met een andere functie van de waarde 1997-1998
-        return averageTwoYearsValue(splitString[0], splitString[1])
-    } else {
-        // return van 01-01-1998 alleen de waarde 1998
-        return splitString[2]
-    }
-}
-
-// Props: Wiebe
-function averageTwoYearsValue(firstValue, secondValue) {
-    return Math.round((firstValue*1 + secondValue*1) / 2);
-}
-
-// Functie die de eeuwen split
-function splitStringEeuw(data) {
-    var splitEeuw = data.toString().split("-")
-
-    if(splitEeuw[0].length === 2) {
-        return splitEeuw[0]
-    } else if(splitEeuw[0].length === 3) {
-        // stackoverflow: https://stackoverflow.com/questions/35486533/how-can-i-replace-first-two-characters-of-a-string-in-javascript
-        // Hier heb ik alleen een geneste array omdat ik de lengte van het eerste object wil weten
-        return splitEeuw[0][1] + splitEeuw[0][2] + "00"
-    } else if(splitEeuw.length === 1) {
-        return data
-    } else {
-        if(splitEeuw[1].length <= 2) {
-            return splitEeuw[1] + "00"
-        } else {
-            return splitEeuw[1]
-        }
-    }
-}
-
-// Props: Coen
-function deleteUnformattedData(array) {
-    const finalArray = array.filter(item => {
-        if (item.date.value.toString().length === 4 && item.date.value <= 2019 && item.date.value >= 0) {
-            return item
-        }
-    })
- return finalArray
-}
-
-// einde opschonen van data
-
-
-
-// Laurens zijn code!
 // D3 data transfomeren
 // Eigen query aangepast
 const query = `PREFIX wgs84: <http://www.w3.org/2003/01/geo/wgs84_pos#>
@@ -182,77 +17,133 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX edm: <http://www.europeana.eu/schemas/edm/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 
-# let op: geeft aantal van unieke combinaties van ?date en ?landLabel
-SELECT ?landLabel ?lat ?long ?date (COUNT(?cho) AS ?choCount) WHERE {
+SELECT ?landLabel ?countryLat ?countryLong ?continentLabel ?contLat ?contLong ?date (COUNT(?cho) AS ?choCount) WHERE {
    ?cho dct:created ?date;
         dct:spatial ?plaats .
- # We willen geen datums die de string [NI] bevatten
-   FILTER (!REGEX(?date, "[NI]")) . #zorgt ervoor dat de string "NI" niet wordt meegenomen
- # geef het label van het land waar de plaats ligt en de lat/long van het land
+
+  FILTER (!REGEX(?date, "[NI]")) .
+
    ?plaats skos:exactMatch/gn:parentCountry ?land .
-   ?land wgs84:lat ?lat .
-   ?land wgs84:long ?long .
+   ?land wgs84:lat ?countryLat .
+   ?land wgs84:long ?countryLong .
    ?land gn:name ?landLabel .
-} GROUP BY ?date ?landLabel ?lat ?long
+
+  <https://hdl.handle.net/20.500.11840/termmaster2> skos:narrower ?continent .
+  ?continent skos:prefLabel ?continentLabel .
+  ?continent skos:narrower* ?place .
+  ?cho dct:spatial ?place .
+
+
+} GROUP BY ?date ?landLabel ?countryLat ?countryLong ?continentLabel ?contLat ?contLong
 ORDER BY DESC(?choCount)`
 
-// Eigen endpoint
+// Mijn end-point
 const endpoint = "https://api.data.netwerkdigitaalerfgoed.nl/datasets/ivo/NMVW/services/NMVW-14/sparql"
+const svg = select('svg')
+
+const mapSettings = {
+    projection: geoNaturalEarth1().rotate([-11,0]),
+    circleDelay: 11
+}
+
+// Global data variable
+let data
+
+// standaard waarde
+let centuryVar = 2000;
+
 
 makeVisualization()
 
-// Our cleanAllData function which runs other function to make a visualization
+// Our main function which runs other function to make a visualization
 async function makeVisualization(){
-    //Wait for the promise to resolve with the data
-    let data = await loadData(endpoint, query)
-    console.log("rawData: ", data)
-
-    // deze roept de cleanAllData functie aan die de jaartallen schoon maakt
-    data = cleanAllData(data)
-    console.log("cleanedData of dataset: ", data)
-
-    data = data.map(cleanData)
-    console.log("cleanedData: ", data)
-
-	data = transformData(data)
-    console.log("transformedData: ", data)
+    //Draw the map using a module
+    drawMap(svg, mapSettings.projection)
+    //Use the cleanedArr module to get and process our data
+    data = await cleanedArr(endpoint, query)
+    selectionChanged(data)
 }
 
-//Load the data and return a promise which resolves with said data
-function loadData(url, query){
-  return d3.json(endpoint +"?query="+ encodeURIComponent(query) + "&format=json")
-    .then(data => data.results.bindings)
+// Code van Laurens
+//This function will change the graph when the user selects another variable
+function selectionChanged() {
+
+    // Laurens heeft mij hiermee geholpen
+    let arrOfSelectedData = data.find(element => element.key == centuryVar);
+    // veranderd de tekst boven aan
+    document.querySelector("p b:last-of-type").innerHTML =  centuryVar + " & " + (centuryVar + 100);
+
+    let amountOfCountryValues = arrOfSelectedData.values.map(e => e.value).map(v => v.amountOfCountryItems);
+
+    let amountOfCountryItems = arrOfSelectedData.values.map(e => e.value);
+    let amountOfAllItems = d3.sum(amountOfCountryValues)
+    // veranderd de tekst boven aan
+    document.querySelector('p b:first-of-type').innerHTML =  amountOfAllItems;
+
+    // Credits to: https://stackoverflow.com/questions/11488194/how-to-use-d3-min-and-d3-max-within-a-d3-json-command/24744689
+    // Check min en max van huidige selectie
+    // create an array of key, value objects
+    let max = d3.entries(amountOfCountryValues)
+        .sort(function(a, b) {
+            return d3.descending(a.value, b.value);
+        })[0].value;
+    let min = d3.entries(amountOfCountryValues)
+        .sort(function(a, b) {
+            return d3.ascending(a.value, b.value);
+        })[0].value;
+
+    // props van Kris
+    const flattened = arrOfSelectedData.values.reduce((newArray, countries) => {
+        newArray.push(countries.value)
+        return newArray.flat()
+    }, [])
+
+    plotLocations(svg, flattened, mapSettings.projection, min, max)
+
 }
 
-//Nest the data per country
-function transformData(source){
-  let transformed =  d3.nest()
-        // Op landLabel heb ik gegroepeerd in de transformed.forEach method. Dit is allemaal geschreven door Laurens
-		.key(function(d) {
-            return d.date;
-        })
-        .key(function(d) {
-            return d.landLabel;
-        })
-        // Dit is een rollup functie die door de array waardes van elke groep heen loopt. De waarde is weer gebaseerd op die array.
-        // Geeft de lengte terug van de date
-        .rollup(function(v) {
-            return d3.sum(v, function(d) {
-                return d.amount;
-            });
-         })
-        // Dit is de array van de data
-		.object(source);
-  return transformed
-}
 
-//This function gets the nested value out of the object in each property
-// in our data
-function cleanData(row){
-   let result = {}
-    Object.entries(row)
-        .forEach(([key, propValue]) => {
-            result[key] = propValue.value
-  	})
-   return result
+//Plot each location on the map with a circle
+function plotLocations(container, data, projection, min, max) {
+
+    const scale = d3.scaleLinear().domain([ min, max ]).range([ 15, 90 ]);
+
+    let circles = svg.selectAll('circle').data([data][0])
+    let text = svg.selectAll('text').data([data][0])
+
+    // update
+    circles
+        .attr('cx', d => projection([d.contLong, d.contLat])[0])
+        .attr('cy', d => projection([d.contLong, d.contLat])[1])
+        .attr('r', function(d) { return scale(d.amountOfCountryItems) })
+
+    text
+        .attr('x', d => projection([d.contLong, d.contLat])[0])
+        .attr('y', d => projection([d.contLong, d.contLat])[1])
+            .text(d => d.amountOfCountryItems)
+
+    // enter
+    circles
+        .enter()
+        .append('circle')
+            .attr('cx', d => projection([d.contLong, d.contLat])[0])
+            .attr('cy', d => projection([d.contLong, d.contLat])[1])
+            .attr('r', function(d) { return scale(d.amountOfCountryItems) })
+            .attr('opacity', 0.8)
+    text
+        .enter()
+        .append('text')
+            .attr('x', d => projection([d.contLong, d.contLat])[0])
+            .attr('y', d => projection([d.contLong, d.contLat])[1])
+                .text(d => d.amountOfCountryItems)
+
+    // exit
+    circles
+        .exit()
+        .remove()
+    text
+        .exit()
+        .remove()
+
+
 }
