@@ -8,19 +8,14 @@ const jsonResults = config.results.bindings
 export async function cleanedArr(endpoint, query){
   //Load the data and return a promise which resolves with said data
 	let data = await loadData(endpoint, query)
-
     data = data.filter(entry => filterData(entry, "continentLabel"))
-
     // Cleaning of year, number of items and continent
     data = cleanAllData()
     // console.log("cleaned data of items: ", data)
-
 	data = data.map(cleanData)
     // console.log("cleanedData: ", data)
-
     data = calculateAndGroup(data)
     // console.log("End of cleanData", data)
-
     return data
 }
 
